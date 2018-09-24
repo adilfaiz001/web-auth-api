@@ -1,0 +1,49 @@
+html
+{
+  height: 100%;
+  overflow: hidden;
+}
+body
+{
+  min-height: 100%;
+  background-image: linear-gradient(to bottom right,#093028,#237A57);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.cover
+{
+  position: relative;
+  top: 140px;
+}
+.signup{
+  display: flex;
+  justify-content: center;
+}
+.signup-block
+{
+  background-color: #505050;
+border-radius: 10px;
+}
+
+
+.signup h1
+{
+  text-align: center;
+  color: white;
+  font-family: 'Gloria Hallelujah', cursive;
+}
+.signup-heading
+{
+      margin-bottom: 2%;
+}
+
+.signup-form
+{
+  margin-top: 1%;
+  margin-bottom: 4%;
+  display: grid;
+}
+button
+{
+  margin:2% 0%;
+}

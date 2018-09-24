@@ -1,0 +1,9 @@
+nav a
+{
+  font-size: 20px;
+  font-family: 'Gloria Hallelujah', cursive;
+}
+.navbar
+{
+  border-radius: 0 !important;
+}

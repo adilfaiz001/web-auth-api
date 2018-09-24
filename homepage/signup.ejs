@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  <link rel="stylesheet" href="/css/signup.css">
+  <link rel="stylesheet" href="/css/header.css">
+
+
+
+  <link href="https://fonts.googleapis.com/css?family=Gloria+Hallelujah" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+  <title>Social Cops</title>
+</head>
+<body>
+  <% include partials/header.ejs %>
+  <div class="cover row">
+
+    <div class="signup col-md-12 col-sm-12 col-xs-12">
+      <div class=" signup-block col-md-5 col-sm-5 col-xs-12">
+
+        <div class="signup-heading col-md-12 col-xs-12">
+          <h1>SignUp</h1>
+        </div>
+
+        <div class="signup-form col-md-12 col-sm-12 col-xs-12">
+            <input id="name" type="text" name="name" value="" placeholder="name">
+            <input id="email" type="text" name="email" value="" placeholder="email">
+            <input id="phone" type="text" name="phone" value="" placeholder="phone">
+            <input id="password" type="password" name="password" value="" placeholder="password">
+            <button id="signup-button" type="submit" name="signup" value="">Signup</button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+
+  <script src="js/signup.js"></script>
+  <script>
+
+      var _name = document.getElementById('name');
+      var email = document.getElementById('email');
+      var phone = document.getElementById('phone');
+      var password = document.getElementById('password');
+
+      document.getElementById("signup-button").onclick = function(){
+          const request = new XMLHttpRequest();
+          let url = generateSignupQueryURL({
+            "name" : _name.value,
+            "email" : email.value,
+            "phone" : phone.value,
+            "password" : password.value
+          });
+
+          request.open('POST', `/signupWorker?${url}`, true);
+          request.send();
+
+          request.onreadystatechange = event => {
+            if (request.readyState === 4 && request.status === 200){
+              let response = JSON.parse(request.response);
+              let uid = response.uid;
+              if (response.state === "SUCCESS"){
+                console.log("SUCCESS");
+                createLoginToken(response).then(()=>{
+                  window.location.port = '3000';
+                  window.location = `http://account:`+window.location.port+`/?uid=${uid}`;
+                });
+              }
+              else if(response.state === "PHONE-EXISTS") {
+                  console.log(response.state);
+                  alert("ERROR: An account with this number already exist");
+              }
+            }
+          }
+      }
+  </script>
+
+
+
+</body>
+</html>
