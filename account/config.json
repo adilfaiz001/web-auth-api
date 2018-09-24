@@ -1,0 +1,10 @@
+{
+  "firebase":{
+    "apiKey": "AIzaSyBRxlMuqn03-WMgFy0ek1tyXBg8_ZHwv-Y",
+    "authDomain": "socialcops-4284f.firebaseapp.com",
+    "databaseURL": "https://socialcops-4284f.firebaseio.com",
+    "projectId": "socialcops-4284f",
+    "storageBucket": "",
+    "messagingSenderId": "828362521488"
+  }
+}

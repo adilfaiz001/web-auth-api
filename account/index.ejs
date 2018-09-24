@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Profile</title>
+</head>
+<body>
+    <div class="app col-md-12 col-sm-12 col-xs-12">
+      <div class="sidebar">
+        <h1 id="profile-name"></h1>
+      </div>
+    </div>
+    <script src="https://www.gstatic.com/firebasejs/5.5.0/firebase.js"></script>
+    <script>
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyBRxlMuqn03-WMgFy0ek1tyXBg8_ZHwv-Y",
+        authDomain: "socialcops-4284f.firebaseapp.com",
+        databaseURL: "https://socialcops-4284f.firebaseio.com",
+        projectId: "socialcops-4284f",
+        storageBucket: "socialcops-4284f.appspot.com",
+        messagingSenderId: "828362521488"
+      };
+      firebase.initializeApp(config);
+      userData = firebase.database();
+      var uid = '<%= uid %>';
+      var profile = {};
+      userData.ref().child('users').orderByChild('uid').equalTo(uid).limitToFirst(1).once('child_added', async function(user,error){
+        console.log(user.val());
+        profile = {
+          name : decodeURI(user.val().name),
+          email : user.val().email,
+          phone : user.val().phone,
+          uid : user.val().uid
+        }
+        console.log(profile);
+      },function(error){
+        console.log("Error: "+error.code);
+      }
+    ).then(function(){
+      console.log("Name : "+profile.name);
+      document.getElementById('profile-name').innerHTML = profile.name;
+    });
+
+    </script>
+</body>
+</html>
