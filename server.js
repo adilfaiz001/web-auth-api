@@ -128,11 +128,146 @@ account.post('/loginWorker',(req,res)=>{
 
 });
 
+
+
+//----------------------------Password Reset-----------------------------------//
+account.get('/forget',(req,res)=>{
+    res.render('forget');
+});
+
 account.post('/resetPassword',(req,res,next)=>{
-  forgetPasswordWorker.resetPassword(req,res,next);
+    forgetPasswordWorker.resetPassword(req,res,next);
+});
+
+account.get('/reset/:token',(req,res)=>{
+
+    var userData = firebaseSignup.firebase.database();
+    var timestamp = Date.now();
+
+    userData.ref().child('users').orderByChild('resetPasswordToken').equalTo(req.params.token).limitToFirst(1).once('value',(userch)=>{
+
+        if (userch.val()===null)
+        {
+            console.log("Invalid token");
+            req.flash('error', 'Password reset token is invalid or has expired.');
+            return res.redirect('/forget');
+        }
+        else if(userch.val().resetPasswordExpires<timestamp){
+            console.log('Token Expires');
+            req.flash('error','Password reset token expires');
+            return res.redirect('/forget');
+        }
+        else {
+            console.log("Success! Render to reset page");
+            res.render('reset', {token: req.params.token});
+        }
+        //console.log(userch.val().resetPasswordExpires+"   "+timestamp);
+    });
+});
+
+account.post('/reset/:token',(req,res)=>{
+
+    console.log(req.params.token);
+    console.log(req.body.password+'  '+req.body.confirm);
+
+    resetWorker.resetPassword(req,res);
+});
+
+//-----------------------------------------------------------------------------//
+
+
+
+
+account.post('/sessionsWorker', (req, res) => {
+    let params = getParameters(req);
+    SessionsWorker.BookSession({
+        "uid" : params.uid,
+        "phone" : params.phone,
+        "name" : decodeURI(params.name),
+        "location" : params.location,
+        "duration" : params.duration,
+        "device" : params.device
+    }).then( _res => {
+        if(_res.success===true){
+            res.status(200).json({
+                "state" : "SUCCESS",
+                "sid" : _res.sid,
+                "startDate" : _res.startDate
+            });
+            console.log(`\nNEW SESSION ADDED => \n\t- sid: ${_res.sid} \n\t- phone: ${params.phone}`);
+        } else {
+            res.status(500).json({"state" : "FAILED"});
+        }
+    }).catch((err)=>{
+        console.log('\n'+err+'\n');
+        res.status(500).send(err);
+    });
+});
+account.post('/userCancelSession', (req, res)=> {
+    let params = getParameters(req);
+    SessionsWorker.CancelSession(params.sid, params.exp).then((_res)=>{
+        if(_res.success===true){
+            res.status(200).json({
+                "state" : "SUCCESS"
+            });
+        } else {
+            res.status(200).json({"state" : "NO-USER"});
+        }
+    });
+});
+account.post('/userCancelActiveSession', (req, res)=> {
+    let params = getParameters(req);
+    // SessionsWorker.CancelSession(params.sid).then((_res)=>{
+    //     if(_res.success===true){
+    //         res.status(200).json({
+    //             "state" : "SUCCESS"
+    //         });
+    //     } else {
+    //         res.status(200).json({"state" : "NO-USER"});
+    //     }
+    // });
+    SessionsWorker.ExpireSession(params.sid).then((_res)=>{
+        if(_res.success===true){
+            res.status(200).json({
+                "state" : "SUCCESS"
+            });
+        } else {
+            res.status(200).json({"state" : "NO-USER"});
+        }
+    });
+});
+
+//---------------------------referral--------------------------------//
+const referLink = require('./util/referralWorker');
+
+account.get('/referral/:user',(req,res)=>{
+    var url;
+
+    if((req.params.user !== 'undefined'))
+    {
+        referLink.getLink(req.params.user).then((_res)=>{
+            if (_res.status === true)
+            {
+                url = _res.url;
+            }
+            res.render('referral',{user:req.params.user,referLink:url});
+        });
+
+
+    }
+    else if (req.params.user === 'undefined')
+    {
+        res.redirect('http://homepage:3000/signup');
+    }
+    else
+    {
+        res.redirect('http://homepage:3000/signup');
+    }
+
 });
 
 
+//-----------------------------------------------------------------------------//
 
 
 
